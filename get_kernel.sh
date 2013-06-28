@@ -1,115 +1,97 @@
 #!/bin/bash
 
-if [ -z "${1}" ]; then
-	echo "You need to pass the kernel you want" && exit
-fi
+# Copyright (C) 2013 Jonathan Vasquez <jvasquez1011@gmail.com>
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-HOME="$(pwd)"
-KERNEL="${1}"
-KERNEL_PATH="/usr/src/${KERNEL}"
-TMPDIR="/tmp/some"
-KV="${1#*-}"
+. libraries/common.sh
 
-# Kernel Version Individuals
-VERSION=$(cat ${KERNEL_PATH}/Makefile | grep -E "^VERSION" | cut -d " " -f 3)
-PATCHLEVEL=$(cat ${KERNEL_PATH}/Makefile | grep -E "^PATCHLEVEL" | cut -d " " -f 3)
-SUBLEVEL=$(cat ${KERNEL_PATH}/Makefile | grep -E "^SUBLEVEL" | cut -d " " -f 3)
+einfo "Kernel = ${K}"
+einfo "Kernel Directory = ${KP}"
+einfo "Home = ${H}"
 
-# Kernel Revision (LOCALVERSION)
-REV=$(cat ${KERNEL_PATH}/.config | grep "CONFIG_LOCALVERSION=" | cut -d '"' -f 2)
-
-# Kernel Version
-KV="${VERSION}.${PATCHLEVEL}.${SUBLEVEL}"
-
-# Kernel Version + Revision
-KF="${KV}${REV}"
-
-# Kernel Version + Revision + 'linux' prefix
-KC="linux-${KF}"
-
-echo "Kernel full is: ${KF}"
-
-echo "Kernel: ${KERNEL}"
-
-echo "Creating Layout..."
+#### Start of Script ####
+einfo "Creating Layout..."
 
 # Check to see if the temporary directory exists
-if [ -d "${TMPDIR}" ]; then
-	rm -rf ${TMPDIR}
+if [ -d "${T}" ]; then
+	rm -rf ${T}
 
-	if [ ! -d "${TMPDIR}" ]; then
-		mkdir ${TMPDIR}
+	if [ ! -d "${T}" ]; then
+		mkdir ${T}
 	fi
 else
-	mkdir ${TMPDIR}
+	mkdir ${T}
 fi
 
-cd ${TMPDIR}
+# Let's start at the Temporary Directory
+cd ${T}
 
 # Create categories
-mkdir kernel modules headers firmware
+mkdir ${KERNEL} ${MODULES} ${FIRMWARE} ${HEADERS}
 
 # Copy the System.map before cleaning since after you run a 'make clean'
 # the System.map file will be deleted.
-echo "Copying System.map into headers before cleaning..."
-cd ${TMPDIR}/headers
-mkdir ${KC} && cd ${KC}
-mkdir arch
+einfo "Copying System.map..."
 
-cp ${KERNEL_PATH}/System.map .
+mkdir ${HEADERS}/${K} && cd ${HEADERS}/${K}
+mkdir ${HEADERS}/${K}/arch
+
+cp ${KP}/System.map ${HEADERS}/${K}
 
 # Install the kernel and the modules
-echo "Installing Kernel and Modules..."
-cd ${KERNEL_PATH}
-make modules_install INSTALL_MOD_PATH=${TMPDIR}/modules > /dev/null 2>&1
-make install INSTALL_PATH=${TMPDIR}/kernel > /dev/null 2>&1
+einfo "Installing Kernel and Modules..."
+
+# Change into kernel path so that we can run the [modules_]install commands.
+cd ${KP}
+
+make modules_install INSTALL_MOD_PATH=${MODULES} > /dev/null 2>&1
+make install INSTALL_PATH=${KERNEL} > /dev/null 2>&1
 
 # Adjust the kernel directory to the root of the modules folder
-mv ${TMPDIR}/modules/lib/modules/${KF} ${TMPDIR}/modules/
+mv ${MODULES}/lib/modules/${KLV} ${MODULES}
 
 # Fix kernel modules symlinks
-cd ${TMPDIR}/modules/${KF}
-rm -v build source
-ln -s /usr/src/${KC} build
-ln -s /usr/src/${KC} source
+cd ${MODULES}/${KLV}
 
-echo "Moving firmware to the firmware directory"
-mkdir -p ${TMPDIR}/firmware/
-mv ${TMPDIR}/modules/lib/firmware/* ${TMPDIR}/firmware/
+rm build source
+ln -s /usr/src/${K} build
+ln -s /usr/src/${K} source
+
+einfo "Installing Firmware..."
+mv ${MODULES}/lib/firmware/* ${FIRMWARE}
 
 # Delete the empty lib folder
-rm -rf ${TMPDIR}/modules/lib/
+rm -rf ${MODULES}/lib/
 
 # Return back to kernel directory
-cd ${KERNEL_PATH}
+cd ${KP}
 
 # Clean the kernel sources directory so that we will have a smaller
 # headers package.
-echo "Cleaning Kernel Sources"
+einfo "Cleaning Kernel Sources..."
 make clean > /dev/null 2>&1
 
 # Copy all the requires files for the headers
-echo "Creating Headers..."
-cd ${TMPDIR}/headers/${KC}
+einfo "Creating Headers..."
 
-cp ${KERNEL_PATH}/.config .
-cp -r ${KERNEL_PATH}/Makefile .
-cp -r ${KERNEL_PATH}/Module.symvers .
-cp -r ${KERNEL_PATH}/arch/x86 arch/
-cp -r ${KERNEL_PATH}/include .
-cp -r ${KERNEL_PATH}/scripts .
+cp -r ${KP}/{.config,Makefile,Module.symvers,include,scripts} ${HEADERS}/${K}
+cp -r ${KP}/arch/x86 ${HEADERS}/${K}/arch/
 
 # Copy all the gathered data back to a safe location so that if you run
 # the script again, you won't lose the data.
-echo "Moving headers back HOME..."
+einfo "Saving Files to ${F}..."
 
-mkdir ${HOME}/${KERNEL}
-mv ${TMPDIR}/* ${HOME}/${KERNEL}
+mkdir ${F}
+mv ${T}/* ${F}
 
 # Remove the temporary directory.
-echo "Cleaning up..."
-rm -rf ${TMPDIR}
+einfo "Cleaning Up..."
 
-if [ -d "${TMPDIR}" ]; then
-	echo "Couldn't clean up after ourselves. Please delete the ${TMPDIR} directory."
+rm -rf ${T}
+
+if [ -d "${T}" ]; then
+	die "Couldn't clean up after ourselves. Please delete the ${T} directory."
 fi

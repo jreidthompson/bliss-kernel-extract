@@ -1,47 +1,31 @@
 #!/bin/bash
 
+# Copyright (C) 2013 Jonathan Vasquez <jvasquez1011@gmail.com>
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+. libraries/common.sh
+
 if [ -z "${1}" ]; then
-	echo "You need to pass the kernel you want" && exit
+	die "You need to pass the kernel you want"
 fi
 
-# K = Kernel
-# KP = Kernel Path
-# KV = Kernel Version
-# H = Home
-# TMP = Temporary Directory
-H="$(pwd)"
-K="${1}"
-KP="/usr/src/${K}"
+if [ ! -d "${F}" ]; then
+	die "The directory where the files are doesn't exist! Exiting."
+fi
 
-# Kernel Version Individuals
-VERSION=$(cat ${KP}/Makefile | grep -E "^VERSION" | cut -d " " -f 3)
-PATCHLEVEL=$(cat ${KP}/Makefile | grep -E "^PATCHLEVEL" | cut -d " " -f 3)
-SUBLEVEL=$(cat ${KP}/Makefile | grep -E "^SUBLEVEL" | cut -d " " -f 3)
+mkdir ${FO} && cd ${F}
 
-# Kernel Revision (LOCALVERSION)
-REV=$(cat ${KP}/.config | grep "CONFIG_LOCALVERSION=" | cut -d '"' -f 2)
+einfo "Packing Kernel and Modules..."
+tar -cf ${FO}/kernel-${KLV}.tar kernel modules
+pbzip2 -v ${FO}/kernel-${KLV}.tar
 
-# Kernel Version
-KV="${VERSION}.${PATCHLEVEL}.${SUBLEVEL}"
+echo "Packing Kernel Headers..."
+tar -cf ${FO}/headers-${KLV}.tar headers
+pbzip2 -v ${FO}/headers-${KLV}.tar
 
-# Kernel Version + Revision
-KF="${KV}${REV}"
-
-# Kernel Version + Revision + 'linux' prefix
-KC="linux-${KF}"
-
-echo "Kernel: ${K}"
-
-cd ${H}/${K}
-
-echo "Packing the kernel and modules together"
-tar -cf kernel-${KF}.tar kernel modules
-pbzip2 -v kernel-${KF}.tar
-
-echo "Packing the kernel headers"
-tar -cf headers-${KF}.tar headers
-pbzip2 -v headers-${KF}.tar
-
-echo "Packing the kernel firmware"
-tar -cf firmware-${KF}.tar firmware
-pbzip2 -v firmware-${KF}.tar
+echo "Packing Kernel Firmware..."
+tar -cf ${FO}/firmware-${KLV}.tar firmware
+pbzip2 -v ${FO}/firmware-${KLV}.tar
