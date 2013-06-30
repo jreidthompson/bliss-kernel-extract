@@ -22,7 +22,6 @@
 # HEADERS = Headers Directory in the Temporary Directory
 # KERNEL = Kernel Directory in the Temporary Directory
 # MODULES = Modules Directory in the Temporary Directory
-# FIRMWARE = Firmware Directory in the Temporary Directory
 
 # Utility Functions
 
@@ -118,7 +117,6 @@ T="/tmp/b-${RANDOM}-k"
 HEADERS="${T}/headers"
 KERNEL="${T}/kernel"
 MODULES="${T}/modules"
-FIRMWARE="${T}/firmware"
 
 # Final Directory (Where the kernel should be saved)
 F="${H}/kernels/${K}"

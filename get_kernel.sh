@@ -10,7 +10,6 @@
 
 einfo "Kernel = ${K}"
 einfo "Kernel Directory = ${KP}"
-einfo "Home = ${H}"
 
 #### Start of Script ####
 einfo "Creating Layout..."
@@ -30,7 +29,7 @@ fi
 cd ${T}
 
 # Create categories
-mkdir ${KERNEL} ${MODULES} ${FIRMWARE} ${HEADERS}
+mkdir ${HEADERS} ${KERNEL} ${MODULES}
 
 # Copy the System.map before cleaning since after you run a 'make clean'
 # the System.map file will be deleted.
@@ -60,9 +59,6 @@ rm build source
 ln -s /usr/src/${K} build
 ln -s /usr/src/${K} source
 
-einfo "Installing Firmware..."
-mv ${MODULES}/lib/firmware/* ${FIRMWARE}
-
 # Delete the empty lib folder
 rm -rf ${MODULES}/lib/
 
@@ -83,6 +79,11 @@ cp -r ${KP}/arch/x86 ${HEADERS}/${K}/arch/
 # Copy all the gathered data back to a safe location so that if you run
 # the script again, you won't lose the data.
 einfo "Saving Files to ${F}..."
+
+if [ -d "${F}" ]; then
+	eflag "Removing old ${F}..."
+	rm -rf ${F}
+fi
 
 mkdir ${F}
 mv ${T}/* ${F}

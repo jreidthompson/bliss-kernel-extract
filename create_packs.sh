@@ -16,16 +16,23 @@ if [ ! -d "${F}" ]; then
 	die "The directory where the files are doesn't exist! Exiting."
 fi
 
-mkdir ${FO} && cd ${F}
+# Make sure we get a fresh output directory
+if [ ! -d "${FO}" ]; then
+	mkdir ${FO} 
+else
+	rm -rf ${FO}/*
+fi
+
+einfo "[ Starting ]"
+
+cd ${F}
 
 einfo "Packing Kernel and Modules..."
 tar -cf ${FO}/kernel-${KLV}.tar kernel modules
-pbzip2 -v ${FO}/kernel-${KLV}.tar
+pbzip2 ${FO}/kernel-${KLV}.tar
 
-echo "Packing Kernel Headers..."
+einfo "Packing Kernel Headers..."
 tar -cf ${FO}/headers-${KLV}.tar headers
-pbzip2 -v ${FO}/headers-${KLV}.tar
+pbzip2 ${FO}/headers-${KLV}.tar
 
-echo "Packing Kernel Firmware..."
-tar -cf ${FO}/firmware-${KLV}.tar firmware
-pbzip2 -v ${FO}/firmware-${KLV}.tar
+einfo "[ Complete ]"
