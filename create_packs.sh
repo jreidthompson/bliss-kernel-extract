@@ -27,11 +27,15 @@ einfo "[ Starting ]"
 
 cd ${F}
 
-einfo "Packing Kernel and Modules..."
-tar -cf ${FO}/kernel-${KLV}.tar kernel modules
+einfo "Packing Kernel..."
+tar -cf ${FO}/kernel-${KLV}.tar kernel
 pbzip2 ${FO}/kernel-${KLV}.tar
 
-einfo "Packing Kernel Headers..."
+einfo "Packing Modules..."
+tar -cf ${FO}/modules-${KLV}.tar modules
+pbzip2 ${FO}/modules-${KLV}.tar
+
+einfo "Packing Headers..."
 tar -cf ${FO}/headers-${KLV}.tar headers
 pbzip2 ${FO}/headers-${KLV}.tar
 
