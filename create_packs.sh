@@ -29,14 +29,14 @@ cd ${F}
 
 einfo "Packing Kernel..."
 tar -cf ${FO}/kernel-${KLV}.tar kernel
-pbzip2 ${FO}/kernel-${KLV}.tar
+pxz ${FO}/kernel-${KLV}.tar
 
 einfo "Packing Modules..."
 tar -cf ${FO}/modules-${KLV}.tar modules
-pbzip2 ${FO}/modules-${KLV}.tar
+pxz ${FO}/modules-${KLV}.tar
 
 einfo "Packing Headers..."
 tar -cf ${FO}/headers-${KLV}.tar headers
-pbzip2 ${FO}/headers-${KLV}.tar
+pxz ${FO}/headers-${KLV}.tar
 
 einfo "[ Complete ]"

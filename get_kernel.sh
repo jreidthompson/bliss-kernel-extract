@@ -12,7 +12,7 @@ einfo "Kernel = ${K}"
 einfo "Kernel Directory = ${KP}"
 
 #### Start of Script ####
-einfo "Creating Layout..."
+einfo "Creating layout ..."
 
 # Check to see if the temporary directory exists
 if [ -d "${T}" ]; then
@@ -33,7 +33,7 @@ mkdir ${HEADERS} ${KERNEL} ${MODULES}
 
 # Copy the System.map before cleaning since after you run a 'make clean'
 # the System.map file will be deleted.
-einfo "Copying System.map..."
+einfo "Copying System.map ..."
 
 mkdir ${HEADERS}/${K} && cd ${HEADERS}/${K}
 mkdir ${HEADERS}/${K}/arch
@@ -41,7 +41,7 @@ mkdir ${HEADERS}/${K}/arch
 cp ${KP}/System.map ${HEADERS}/${K}
 
 # Install the kernel and the modules
-einfo "Installing Kernel and Modules..."
+einfo "Installing kernel and modules ..."
 
 # Change into kernel path so that we can run the [modules_]install commands.
 cd ${KP}
@@ -67,21 +67,25 @@ cd ${KP}
 
 # Clean the kernel sources directory so that we will have a smaller
 # headers package.
-einfo "Cleaning Kernel Sources..."
+einfo "Cleaning kernel sources ..."
 make clean > /dev/null 2>&1
 
+# Copying blacklist file
+einfo "Copying blacklist file ..."
+cp ${FILES}/${BL} ${MODULES}
+
 # Copy all the requires files for the headers
-einfo "Creating Headers..."
+einfo "Creating headers ..."
 
 cp -r ${KP}/{.config,Makefile,Module.symvers,include,scripts} ${HEADERS}/${K}
 cp -r ${KP}/arch/x86 ${HEADERS}/${K}/arch/
 
 # Copy all the gathered data back to a safe location so that if you run
 # the script again, you won't lose the data.
-einfo "Saving Files to ${F}..."
+einfo "Saving files to ${F} ..."
 
 if [ -d "${F}" ]; then
-	eflag "Removing old ${F}..."
+	eflag "Removing old ${F} ..."
 	rm -rf ${F}
 fi
 
@@ -89,7 +93,7 @@ mkdir ${F}
 mv ${T}/* ${F}
 
 # Remove the temporary directory.
-einfo "Cleaning Up..."
+einfo "Cleaning up ..."
 
 rm -rf ${T}
 

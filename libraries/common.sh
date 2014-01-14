@@ -123,3 +123,9 @@ F="${H}/kernels/${K}"
 
 # Directory where tarballs will be outputted to
 FO="${F}/out"
+
+# Files Directory
+FILES="${H}/files"
+
+# Blacklist File
+BL="stock.conf"
