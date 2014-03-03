@@ -28,15 +28,7 @@ einfo "[ Starting ]"
 cd ${F}
 
 einfo "Packing Kernel..."
-tar -cf ${FO}/kernel-${KLV}.tar kernel
+tar -cf ${FO}/kernel-${KLV}.tar kernel modules headers
 pxz ${FO}/kernel-${KLV}.tar
-
-einfo "Packing Modules..."
-tar -cf ${FO}/modules-${KLV}.tar modules
-pxz ${FO}/modules-${KLV}.tar
-
-einfo "Packing Headers..."
-tar -cf ${FO}/headers-${KLV}.tar headers
-pxz ${FO}/headers-${KLV}.tar
 
 einfo "[ Complete ]"
