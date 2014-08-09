@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2013-2014 Jonathan Vasquez <fearedbliss@funtoo.org>
+# Copyright 2013-2014 Jonathan Vasquez <jvasquez1011@gmail.com>
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,10 +15,10 @@ einfo "Kernel Directory = ${KP}"
 einfo "Creating layout ..."
 
 # Check to see if the temporary directory exists
-if [ -d "${T}" ]; then
+if [[ -d "${T}" ]]; then
 	rm -rf ${T}
 
-	if [ ! -d "${T}" ]; then
+	if [[ ! -d "${T}" ]]; then
 		mkdir ${T}
 	fi
 else
@@ -84,7 +84,7 @@ cp -r ${KP}/arch/x86 ${HEADERS}/${K}/arch/
 # the script again, you won't lose the data.
 einfo "Saving files to ${F} ..."
 
-if [ -d "${F}" ]; then
+if [[ -d "${F}" ]]; then
 	eflag "Removing old ${F} ..."
 	rm -rf ${F}
 fi
@@ -97,6 +97,27 @@ einfo "Cleaning up ..."
 
 rm -rf ${T}
 
-if [ -d "${T}" ]; then
+if [[ -d "${T}" ]]; then
 	die "Couldn't clean up after ourselves. Please delete the ${T} directory."
 fi
+
+# Pack and Let's go home!
+
+if [[ ! -d "${F}" ]]; then
+	die "The directory where the files are doesn't exist! Exiting."
+fi
+
+# Make sure we get a fresh output directory
+if [[ ! -d "${FO}" ]]; then
+	mkdir ${FO} 
+else
+	rm -rf ${FO}/*
+fi
+
+cd ${F}
+
+einfo "Packing Kernel..."
+tar -cf ${FO}/kernel-${KLV}.tar kernel modules headers
+pxz ${FO}/kernel-${KLV}.tar
+
+einfo "Complete!"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2013-2014 Jonathan Vasquez <fearedbliss@funtoo.org>
+# Copyright 2013-2014 Jonathan Vasquez <jvasquez1011@gmail.com>
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,7 +8,6 @@
 
 #### Variables ####
 
-# KN = Kernel (Name, the same name you called the folder in /usr/src)
 # KP = Kernel Path
 # KV = Kernel Version
 # KLV = Kernel Version + Local Version (Revision)
@@ -18,6 +17,9 @@
 # LV = Local Version (Revision)
 #
 # T = Temporary Directory
+#
+# F = Final Directory where kernel files will be placed
+# FO = Files where tarballs will be placed
 #
 # HEADERS = Headers Directory in the Temporary Directory
 # KERNEL = Kernel Directory in the Temporary Directory
@@ -73,19 +75,13 @@ die()
 check_kernel()
 {
 	# Check to see if the kernel exists and set the symlink if it does
-	if [ ! -d "${KP}" ]; then
+	if [[ ! -d "${KP}" ]]; then
 		die "Kernel not found! Exiting!"
 	fi
 }
 
-# Check to see if a parameter was passed
-if [ -z "${1}" ]; then
-	die "You need to pass the kernel you want"
-fi
-
-# Set 'Kernel Name' and 'Kernel Path'
-KN="${1}"
-KP="/usr/src/${KN}"
+# Set 'Kernel Path'
+KP="/usr/src/linux"
 
 # Check to see if the kernel exists
 check_kernel
@@ -121,11 +117,11 @@ MODULES="${T}/modules"
 # Final Directory (Where the kernel should be saved)
 F="${H}/kernels/${K}"
 
-# Directory where tarballs will be outputted to
+# Directory where tarballs will be placed
 FO="${F}/out"
 
 # Files Directory
 FILES="${H}/files"
 
 # Blacklist File
-BL="chinchilla.conf"
+BL="xyinn.conf"
