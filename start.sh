@@ -77,7 +77,7 @@ cp ${FILES}/${BL} ${MODULES}
 # Copy all the requires files for the headers
 einfo "Creating headers ..."
 
-cp -r ${KP}/{.config,Makefile,Module.symvers,include,scripts} ${HEADERS}/${K}
+cp -r ${KP}/{.config,Makefile,Kconfig,Module.symvers,include,scripts} ${HEADERS}/${K}
 cp -r ${KP}/arch/x86 ${HEADERS}/${K}/arch/
 
 # Copy all the gathered data back to a safe location so that if you run
