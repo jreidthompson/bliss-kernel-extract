@@ -40,16 +40,8 @@ fi
 cd ${T}
 
 # Create categories
-mkdir ${HEADERS} ${KERNEL} ${MODULES}
-
-# Copy the System.map before cleaning since after you run a 'make clean'
-# the System.map file will be deleted.
-einfo "Copying System.map ..."
-
-mkdir ${HEADERS}/${K} && cd ${HEADERS}/${K}
-mkdir ${HEADERS}/${K}/arch
-
-cp ${KP}/System.map ${HEADERS}/${K}
+KERNEL_HEADERS_PERM="${HEADERS}/${K}"
+mkdir -p ${KERNEL_HEADERS_PERM}/arch ${KERNEL} ${MODULES}
 
 # Install the kernel and the modules
 einfo "Installing kernel and modules ..."
@@ -76,11 +68,6 @@ rm -rf ${MODULES}/lib/
 # Return back to kernel directory
 cd ${KP}
 
-# Clean the kernel sources directory so that we will have a smaller
-# headers package.
-einfo "Cleaning kernel sources ..."
-make clean > /dev/null 2>&1
-
 # Copying blacklist file
 einfo "Copying blacklist file ..."
 cp ${FILES}/${BL} ${MODULES}
@@ -88,8 +75,26 @@ cp ${FILES}/${BL} ${MODULES}
 # Copy all the requires files for the headers
 einfo "Creating headers ..."
 
-cp -r ${KP}/{.config,Makefile,Kconfig,Module.symvers,include,scripts} ${HEADERS}/${K}
-cp -r ${KP}/arch/x86 ${HEADERS}/${K}/arch/
+cp -r ${KP}/{.config,Makefile,Kconfig,Module.symvers,System.map,include,scripts} ${KERNEL_HEADERS_PERM}
+cp -r ${KP}/arch/x86 ${KERNEL_HEADERS_PERM}/arch
+
+einfo "Cleaning headers ..."
+# Clean the kernel headers manually (We aren't using 'make clean' anymore because
+# then we would need to recompile the sources if we wanted to run this command again.
+
+# A 'make clean' would yield a headers directory of about 61 MB.
+# This manualy clean yields a headers directory of about 67 MB.
+# So we are getting about 90% of the garbage. Good enough.
+
+# This saves about 54.7 MB
+rm ${KERNEL_HEADERS_PERM}/arch/x86/boot/{setup.elf,bzImage,vmlinux.bin}
+rm ${KERNEL_HEADERS_PERM}/arch/x86/boot/compressed/{piggy.o,vmlinux,vmlinux.bin*}
+
+# This saves about 1.9 MB
+rm ${KERNEL_HEADERS_PERM}/arch/x86/kernel/built-in.o
+
+# This saves about 1.4 MB
+rm -rf ${KERNEL_HEADERS_PERM}/include/dt-bindings
 
 # Copy all the gathered data back to a safe location so that if you run
 # the script again, you won't lose the data.
