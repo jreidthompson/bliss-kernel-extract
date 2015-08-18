@@ -22,7 +22,7 @@ if [[ -d "${F}" ]]; then
 fi
 
 einfo "Kernel = ${K}"
-einfo "Kernel Directory = ${KP}"
+einfo "Kernel directory = ${KP}"
 einfo "Creating layout ..."
 
 # Check to see if the temporary directory exists
@@ -99,6 +99,7 @@ mkdir ${F}
 mv ${T}/* ${F}
 
 # Remove the temporary directory.
+einfo "Cleaning temporary directory ..."
 clean_temp_dir
 
 # Pack and Let's go home!
@@ -115,7 +116,7 @@ fi
 
 cd ${F}
 
-einfo "Packing Kernel..."
+einfo "Packing kernel..."
 tar -cf ${FO}/kernel-${KLV}.tar kernel modules headers
 pxz ${FO}/kernel-${KLV}.tar
 

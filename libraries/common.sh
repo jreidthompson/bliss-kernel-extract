@@ -72,8 +72,6 @@ die()
 # Cleans the temporary directory
 clean_temp_dir()
 {
-    einfo "Cleaning temporary directory ..."
-
     rm -rf "${T}"
 
     if [[ -d "${T}" ]]; then
