@@ -66,7 +66,19 @@ eline()
 # Used for errors
 die()
 {
-        echo -e "\e[1;31m>>>\e[0;m ${@}" && exit
+        echo -e "\e[1;31m>>>\e[0;m ${@}" && clean_temp_dir && exit
+}
+
+# Cleans the temporary directory
+clean_temp_dir()
+{
+    einfo "Cleaning temporary directory ..."
+
+    rm -rf "${T}"
+
+    if [[ -d "${T}" ]]; then
+        ewarn "Couldn't clean up after ourselves. Please delete the ${T} directory." && exit
+    fi
 }
 
 # Check to see if a kernel directory was passed as a parameter

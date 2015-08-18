@@ -99,13 +99,7 @@ mkdir ${F}
 mv ${T}/* ${F}
 
 # Remove the temporary directory.
-einfo "Cleaning up ..."
-
-rm -rf ${T}
-
-if [[ -d "${T}" ]]; then
-    die "Couldn't clean up after ourselves. Please delete the ${T} directory."
-fi
+clean_temp_dir
 
 # Pack and Let's go home!
 if [[ ! -d "${F}" ]]; then
