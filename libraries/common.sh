@@ -12,7 +12,7 @@
 # KV = Kernel Version
 # KLV = Kernel Version + Local Version (Revision)
 # K = Kernel (Linux Prefix (linux-) + Kernel Version + Local Version (Revision)
-# 
+#
 # H = Home
 # LV = Local Version (Revision)
 #
@@ -30,25 +30,25 @@
 # Used for displaying information
 einfo()
 {
-        eline && echo -e "\e[1;32m>>>\e[0;m ${@}"
+        echo -e "\e[1;32m>>>\e[0;m ${@}"
 }
 
 # Used for input (questions)
 eqst()
 {
-        eline && echo -en "\e[1;37m>>>\e[0;m ${@}"
+        echo -en "\e[1;37m>>>\e[0;m ${@}"
 }
 
 # Used for warnings
 ewarn()
 {
-        eline && echo -e "\e[1;33m>>>\e[0;m ${@}"
+        echo -e "\e[1;33m>>>\e[0;m ${@}"
 }
 
 # Used for flags
 eflag()
 {
-        eline && echo -e "\e[1;34m>>>\e[0;m ${@}"
+        echo -e "\e[1;34m>>>\e[0;m ${@}"
 }
 
 # Used for options
@@ -57,33 +57,36 @@ eopt()
         echo -e "\e[1;36m>>\e[0;m ${@}"
 }
 
-
 # Prints empty line
 eline()
 {
-	echo ""
+    echo ""
 }
-
 
 # Used for errors
 die()
 {
-        eline && echo -e "\e[1;31m>>>\e[0;m ${@}" && eline && exit
+        echo -e "\e[1;31m>>>\e[0;m ${@}" && exit
+}
+
+# Check to see if a kernel directory was passed as a parameter
+check_param()
+{
+    if [[ -z "${KP}" ]]; then
+        die "No kernel directory was passed."
+    fi
 }
 
 # Check to see if the kernel exists
 check_kernel()
 {
-	# Check to see if the kernel exists and set the symlink if it does
-	if [[ ! -d "${KP}" ]]; then
-		die "Kernel not found! Exiting!"
-	fi
+    # Check to see if the kernel exists
+    if [[ ! -d "${KP}" ]]; then
+        die "Kernel not found! Exiting!"
+    fi
 }
 
-# Set 'Kernel Path'
-KP="/usr/src/linux"
-
-# Check to see if the kernel exists
+check_param
 check_kernel
 
 # Set 'Home'
@@ -107,7 +110,7 @@ KLV="${KV}${LV}"
 K="linux-${KLV}"
 
 # Temporary Directory
-T="/tmp/b-${RANDOM}-k"
+T=`mktemp -d`
 
 # Target Directories
 HEADERS="${T}/headers"

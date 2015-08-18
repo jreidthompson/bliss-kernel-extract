@@ -6,23 +6,34 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+# Set kernel path
+KP=$1
+
 . libraries/common.sh
+
+#### Start of Script ####
+
+# Let's first check to see if our final directory exists.
+# If we don't do this here, then we will end up wiping the kernel
+# directory stuff when we are cleaning it up, and at the end it will
+# fail since we can't save any of it.
+if [[ -d "${F}" ]]; then
+    die "The final output directory already exists: \n${F} \nPlease remove it if you want to re-use this directory."
+fi
 
 einfo "Kernel = ${K}"
 einfo "Kernel Directory = ${KP}"
-
-#### Start of Script ####
 einfo "Creating layout ..."
 
 # Check to see if the temporary directory exists
 if [[ -d "${T}" ]]; then
-	rm -rf ${T}
+    rm -rf ${T}
 
-	if [[ ! -d "${T}" ]]; then
-		mkdir ${T}
-	fi
+    if [[ ! -d "${T}" ]]; then
+        mkdir ${T}
+    fi
 else
-	mkdir ${T}
+    mkdir ${T}
 fi
 
 # Let's start at the Temporary Directory
@@ -84,11 +95,6 @@ cp -r ${KP}/arch/x86 ${HEADERS}/${K}/arch/
 # the script again, you won't lose the data.
 einfo "Saving files to ${F} ..."
 
-if [[ -d "${F}" ]]; then
-	eflag "Removing old ${F} ..."
-	rm -rf ${F}
-fi
-
 mkdir ${F}
 mv ${T}/* ${F}
 
@@ -98,20 +104,19 @@ einfo "Cleaning up ..."
 rm -rf ${T}
 
 if [[ -d "${T}" ]]; then
-	die "Couldn't clean up after ourselves. Please delete the ${T} directory."
+    die "Couldn't clean up after ourselves. Please delete the ${T} directory."
 fi
 
 # Pack and Let's go home!
-
 if [[ ! -d "${F}" ]]; then
-	die "The directory where the files are doesn't exist! Exiting."
+    die "The directory where the files are doesn't exist! Exiting."
 fi
 
 # Make sure we get a fresh output directory
 if [[ ! -d "${FO}" ]]; then
-	mkdir ${FO} 
+    mkdir ${FO}
 else
-	rm -rf ${FO}/*
+    rm -rf ${FO}/*
 fi
 
 cd ${F}
