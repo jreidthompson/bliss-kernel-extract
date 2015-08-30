@@ -96,6 +96,12 @@ rm ${KERNEL_HEADERS_PERM}/arch/x86/kernel/built-in.o
 # This saves about 1.4 MB
 rm -rf ${KERNEL_HEADERS_PERM}/include/dt-bindings
 
+# Remove 'mconf' since it links to ncurses and it seems we don't actually need it
+# for compiling out of tree kernel modules. This link becomes broken when we upgrade
+# to a new ncurses version and causes Portage's 'emerge @preserved-rebuild' message
+# to appear.
+rm ${KERNEL_HEADERS_PERM}/scripts/kconfig/mconf
+
 # Copy all the gathered data back to a safe location so that if you run
 # the script again, you won't lose the data.
 einfo "Saving files to ${F} ..."
