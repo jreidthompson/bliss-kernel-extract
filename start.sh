@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2013-2015 Jonathan Vasquez <jvasquez1011@gmail.com>
+# Copyright 2013-2016 Jonathan Vasquez <jvasquez1011@gmail.com>
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -67,10 +67,6 @@ rm -rf ${MODULES}/lib/
 
 # Return back to kernel directory
 cd ${KP}
-
-# Copying blacklist file
-einfo "Copying blacklist file ..."
-cp ${FILES}/${BL} ${MODULES}
 
 # Copy all the requires files for the headers
 einfo "Creating headers ..."

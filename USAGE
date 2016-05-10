@@ -3,7 +3,6 @@ Generates a kernel package (tarball) that includes:
 - kernel image
 - kernel modules
 - kernel headers
-- blacklist configuration file
 
 The "start.sh" script automatically extracts the needed files
 from your /usr/src/linux directory. Make sure to set the symlink
