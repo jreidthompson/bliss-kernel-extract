@@ -71,32 +71,19 @@ cd ${KP}
 # Copy all the requires files for the headers
 einfo "Creating headers ..."
 
-cp -r ${KP}/{.config,Makefile,Kconfig,Module.symvers,System.map,include,scripts} ${KERNEL_HEADERS_PERM}
-cp -r ${KP}/arch/x86 ${KERNEL_HEADERS_PERM}/arch
+cp -r "${KP}"/* "${KERNEL_HEADERS_PERM}"
+cd ${KERNEL_HEADERS_PERM}
 
 einfo "Cleaning headers ..."
-# Clean the kernel headers manually (We aren't using 'make clean' anymore because
-# then we would need to recompile the sources if we wanted to run this command again.
-
-# A 'make clean' would yield a headers directory of about 61 MB.
-# This manualy clean yields a headers directory of about 67 MB.
-# So we are getting about 90% of the garbage. Good enough.
-
-# This saves about 54.7 MB
-rm ${KERNEL_HEADERS_PERM}/arch/x86/boot/{setup.elf,bzImage,vmlinux.bin}
-rm ${KERNEL_HEADERS_PERM}/arch/x86/boot/compressed/{piggy.o,vmlinux,vmlinux.bin*}
-
-# This saves about 1.9 MB
-rm ${KERNEL_HEADERS_PERM}/arch/x86/kernel/built-in.o
-
-# This saves about 1.4 MB
-rm -rf ${KERNEL_HEADERS_PERM}/include/dt-bindings
+make clean
 
 # Remove 'mconf' since it links to ncurses and it seems we don't actually need it
 # for compiling out of tree kernel modules. This link becomes broken when we upgrade
 # to a new ncurses version and causes Portage's 'emerge @preserved-rebuild' message
 # to appear.
-rm ${KERNEL_HEADERS_PERM}/scripts/kconfig/mconf
+#rm ${KERNEL_HEADERS_PERM}/scripts/kconfig/mconf
+
+cd ${KP}
 
 # Copy all the gathered data back to a safe location so that if you run
 # the script again, you won't lose the data.
@@ -124,7 +111,9 @@ fi
 cd ${F}
 
 einfo "Packing kernel..."
-tar -cf ${FO}/kernel-${KLV}.tar kernel modules headers
+tar -cf ${FO}/kernel-${KLV}.tar kernel modules
+tar -cf ${FO}/kernel-sources-${KLV}.tar headers
 pxz ${FO}/kernel-${KLV}.tar
+pxz ${FO}/kernel-sources-${KLV}.tar
 
 einfo "Complete!"
