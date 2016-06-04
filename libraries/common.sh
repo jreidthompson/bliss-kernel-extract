@@ -106,12 +106,13 @@ H="$(pwd)"
 VERSION=$(cat ${KP}/Makefile | grep -E "^VERSION" | cut -d " " -f 3)
 PATCHLEVEL=$(cat ${KP}/Makefile | grep -E "^PATCHLEVEL" | cut -d " " -f 3)
 SUBLEVEL=$(cat ${KP}/Makefile | grep -E "^SUBLEVEL" | cut -d " " -f 3)
+EXTRAVERSION=$(cat ${KP}/Makefile | grep -E "^EXTRAVERSION" | cut -d " " -f 3)
 
 # Kernel Revision (LOCALVERSION)
 LV=$(cat ${KP}/.config | grep "CONFIG_LOCALVERSION=" | cut -d '"' -f 2)
 
 # Kernel Version
-KV="${VERSION}.${PATCHLEVEL}.${SUBLEVEL}"
+KV="${VERSION}.${PATCHLEVEL}.${SUBLEVEL}${EXTRAVERSION}"
 
 # Kernel Version + Revision
 KLV="${KV}${LV}"
