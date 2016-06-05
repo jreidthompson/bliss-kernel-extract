@@ -96,6 +96,45 @@ check_kernel()
     fi
 }
 
+create_categories()
+{
+	mkdir -p ${KERNEL_HEADERS_PERM}/arch ${KERNEL} ${MODULES}
+}
+
+do_headers()
+{
+	einfo "Creating headers ..."
+
+	cp -r ${KP}/{.config,Makefile,Kconfig,Module.symvers,System.map,include,scripts,tools} ${KERNEL_HEADERS_PERM}
+	cp -r ${KP}/arch/x86 ${KERNEL_HEADERS_PERM}/arch
+
+	einfo "Cleaning headers ..."
+	# Clean the kernel headers manually (We aren't using 'make clean' anymore because
+	# then we would need to recompile the sources if we wanted to run this command again.
+	# and it also takes a long time to copy the entire kernel source if we wanted to 'make clean'
+	# a temporary copy.
+
+	# If we extracted the required directories after a 'make clean', it would yield a headers
+	# directory of about 61 MB. This manualy clean yields a headers directory of about 67 MB.
+	# So we are getting about 90% of the garbage. Good enough.
+
+	# This saves about 54.7 MB
+	rm ${KERNEL_HEADERS_PERM}/arch/x86/boot/{setup.elf,bzImage,vmlinux.bin}
+	rm ${KERNEL_HEADERS_PERM}/arch/x86/boot/compressed/{piggy.o,vmlinux,vmlinux.bin*}
+
+	# This saves about 1.9 MB
+	rm ${KERNEL_HEADERS_PERM}/arch/x86/kernel/built-in.o
+
+	# This saves about 1.4 MB
+	rm -rf ${KERNEL_HEADERS_PERM}/include/dt-bindings
+
+	# Remove 'mconf' since it links to ncurses and it seems we don't actually need it
+	# for compiling out of tree kernel modules. This link becomes broken when we upgrade
+	# to a new ncurses version and causes Portage's 'emerge @preserved-rebuild' message
+	# to appear.
+	rm ${KERNEL_HEADERS_PERM}/scripts/kconfig/mconf
+}
+
 check_param
 check_kernel
 
@@ -127,6 +166,8 @@ T=`mktemp -d`
 HEADERS="${T}/headers"
 KERNEL="${T}/kernel"
 MODULES="${T}/modules"
+
+KERNEL_HEADERS_PERM="${HEADERS}/${K}"
 
 # Final Directory (Where the kernel should be saved)
 F="${H}/kernels/${K}"

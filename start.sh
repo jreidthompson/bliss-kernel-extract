@@ -39,9 +39,8 @@ fi
 # Let's start at the Temporary Directory
 cd ${T}
 
-# Create categories
-KERNEL_HEADERS_PERM="${HEADERS}/${K}"
-mkdir -p ${KERNEL_HEADERS_PERM}/arch ${KERNEL} ${MODULES}
+# Create categories (base layout)
+create_categories
 
 # Install the kernel and the modules
 einfo "Installing kernel and modules ..."
@@ -68,22 +67,8 @@ rm -rf ${MODULES}/lib/
 # Return back to kernel directory
 cd ${KP}
 
-# Copy all the requires files for the headers
-einfo "Creating headers ..."
-
-cp -r "${KP}"/* "${KERNEL_HEADERS_PERM}"
-cd ${KERNEL_HEADERS_PERM}
-
-einfo "Cleaning headers ..."
-make clean
-
-# Remove 'mconf' since it links to ncurses and it seems we don't actually need it
-# for compiling out of tree kernel modules. This link becomes broken when we upgrade
-# to a new ncurses version and causes Portage's 'emerge @preserved-rebuild' message
-# to appear.
-#rm ${KERNEL_HEADERS_PERM}/scripts/kconfig/mconf
-
-cd ${KP}
+# Copy and Clean Headers
+do_headers
 
 # Copy all the gathered data back to a safe location so that if you run
 # the script again, you won't lose the data.
@@ -111,9 +96,7 @@ fi
 cd ${F}
 
 einfo "Packing kernel..."
-tar -cf ${FO}/kernel-${KLV}.tar kernel modules
-tar -cf ${FO}/kernel-sources-${KLV}.tar headers
+tar -cf ${FO}/kernel-${KLV}.tar kernel modules headers
 pxz ${FO}/kernel-${KLV}.tar
-pxz ${FO}/kernel-sources-${KLV}.tar
 
 einfo "Complete!"
