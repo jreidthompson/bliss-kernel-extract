@@ -105,8 +105,11 @@ do_headers()
 {
 	einfo "Creating headers ..."
 
-	cp -r ${KP}/{.config,Makefile,Kconfig,Module.symvers,System.map,include,scripts,tools} ${KERNEL_HEADERS_PERM}
+	cp -r ${KP}/{.config,Kconfig,Makefile,Module.symvers,System.map,include,scripts} ${KERNEL_HEADERS_PERM}
 	cp -r ${KP}/arch/x86 ${KERNEL_HEADERS_PERM}/arch
+
+	mkdir -p ${KERNEL_HEADERS_PERM}/tools/objtool
+	cp ${KP}/tools/objtool/objtool ${KERNEL_HEADERS_PERM}/tools/objtool
 
 	einfo "Cleaning headers ..."
 	# Clean the kernel headers manually (We aren't using 'make clean' anymore because
