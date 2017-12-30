@@ -157,6 +157,12 @@ do_headers()
 	# to a new ncurses version and causes Portage's 'emerge @preserved-rebuild' message
 	# to appear.
 	rm ${KERNEL_HEADERS_PERM}/scripts/kconfig/mconf
+
+	# Starting with 4.14:
+	# Remove "dtc/include-headers" directory since it just includes broken symlinks
+	# after our header cleanup, which will cause portage to give QA notices about
+	# broken symlinks.
+	rm -rf ${KERNEL_HEADERS_PERM}/scripts/dtc/include-prefixes
 }
 
 check_param
