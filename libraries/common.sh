@@ -115,22 +115,19 @@ check_kernel()
 
 create_categories()
 {
-	mkdir -p ${KERNEL_HEADERS_PERM}/arch ${KERNEL} ${MODULES}
+	mkdir -p ${KERNEL_HEADERS_PERM}/{arch,tools} ${KERNEL} ${MODULES}
 }
 
 do_headers()
 {
-
-	# Warning: Make sure that your kernel has CONFIG_STACK_VALIDATION
-	# "Compile-time stack metadata validation" set to no.
-	# If not, starting with kernel 4.6, a tool called 'objtool' will be built and this
-	# will cause problems when people use the created headers to compile
-	# third party modules (It has to due with objtool requiring libelf dependencies
-	# which may not be exist on the target system.. There might be other issues as well.
 	einfo "Creating headers ..."
 
 	cp -r ${KP}/{.config,Kconfig,Makefile,Module.symvers,System.map,include,scripts} ${KERNEL_HEADERS_PERM}
 	cp -r ${KP}/arch/x86 ${KERNEL_HEADERS_PERM}/arch
+
+	# We need objtool as well now with 4.14 (and other kernels that use CONFIG_STACK_VALIDATION I believe)
+	# if we don't have this, then our "can build modules" check will fail in SPL/ZFS
+	cp -r ${KP}/tools/objtool ${KERNEL_HEADERS_PERM}/tools/
 
 	einfo "Cleaning headers ..."
 	# Clean the kernel headers manually (We aren't using 'make clean' anymore because
