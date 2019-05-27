@@ -1,6 +1,6 @@
 bliss-kernel-extract
 Jonathan Vasquez <jon@xyinn.org>
-GPLv3+
+Apache License 2.0
 
 Generates a kernel package (tarball) that includes:
 
